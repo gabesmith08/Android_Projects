@@ -1,0 +1,1 @@
+Android application that allows the user to type in a text box and then click the send button. Once the user clicks the send button, they are immediatly redirected to a new page with their text input now centered and font changed into cursive.
