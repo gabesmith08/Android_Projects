@@ -1,14 +1,21 @@
 package com.example.storm;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.storm.databinding.ActivityMainBinding;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -23,21 +30,29 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
 
     private CurrentWeather currentWeather;
+    private ImageView iconImageView;
+    final double latitude = 41.654670;
+    final double longitude = -90.583000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        getForcast(latitude, longitude);
+    }
+
+    private void getForcast(double latitude, double longitude) {
+        final ActivityMainBinding binding = DataBindingUtil.setContentView(MainActivity.this,
+                R.layout.activity_main);
 
         // To use darksky's api you have to declare you're using it. So this will be a link
         // in the bottom of the app UI will take you to the terms and legal attribution page of darksky.net
         TextView darkSky = findViewById(R.id.darkSkyLegalAttribution);
         darkSky.setMovementMethod(LinkMovementMethod.getInstance());
 
-        String apiKey = "187aa68d4c757b6f776d3a83393f2120";
+        // variable to set image to current weather condition
+        iconImageView = findViewById((R.id.iconImageView));
 
-        double latitude = 41.654670;
-        double longitude = -90.583000;
+        String apiKey = "187aa68d4c757b6f776d3a83393f2120";
 
         String forecastURL = "https://api.darksky.net/forecast/" + apiKey + "/" + latitude + "," + longitude;
 
@@ -60,6 +75,25 @@ public class MainActivity extends AppCompatActivity {
                         if (response.isSuccessful()) {
 
                             currentWeather = getCurrentDetails(jsonData);
+
+                            // Constructor to get ready to link JSON data to display to screen
+                            CurrentWeather displayWeather = new CurrentWeather(
+                                    currentWeather.getLocationLabel(),
+                                    currentWeather.getIcon(),
+                                    currentWeather.getTime(),
+                                    currentWeather.getTemperature(),
+                                    currentWeather.getHumidity(),
+                                    currentWeather.getPrecipChance(),
+                                    currentWeather.getSummary(),
+                                    currentWeather.getTimeZone()
+                            );
+
+                            // binding is used to link the JSON weather with the all the xml Textviews
+                            binding.setWeather(displayWeather);
+
+                            // sets the current weather picture to use
+                            Drawable drawable = getResources().getDrawable(displayWeather.getIconId());
+                            iconImageView.setImageDrawable(drawable);
 
                         } else {
                             alertUserAboutError();
@@ -117,5 +151,10 @@ public class MainActivity extends AppCompatActivity {
     private void alertUserAboutError(){
         AlertDialogFragment dialog = new AlertDialogFragment();
         dialog.show(getFragmentManager(), "error_dialog");
+    }
+
+    public void refreshOnClick(View view) {
+        Toast.makeText(this, "Refreshing Data", Toast.LENGTH_SHORT).show();
+        getForcast(latitude, longitude);
     }
 }
