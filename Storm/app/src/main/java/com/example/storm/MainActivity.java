@@ -5,13 +5,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
-import java.util.TimeZone;
-import java.util.Date;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -28,6 +28,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // To use darksky's api you have to declare you're using it. So this will be a link
+        // in the bottom of the app UI will take you to the terms and legal attribution page of darksky.net
+        TextView darkSky = findViewById(R.id.darkSkyLegalAttribution);
+        darkSky.setMovementMethod(LinkMovementMethod.getInstance());
 
         String apiKey = "187aa68d4c757b6f776d3a83393f2120";
 
